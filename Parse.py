@@ -5,9 +5,10 @@ import random
 import genanki
 import shutil
 
+from bs4 import BeautifulSoup
 from time import sleep
 from pathlib import Path
-from utils import convert_blobs
+from utils import convert_blobs, clean_html
 
 media_directory = 'media_temp'
 algo_decks_folder_name = 'algo_decks'
@@ -18,16 +19,18 @@ output_path.mkdir(parents=True, exist_ok=True)
 output_path = output_path.absolute()
 
 def read_algo(xml_path, blob_map):
-    tree = ET.parse(xml_path)
-    root = tree.getroot()
+    with open(xml_path, 'r', encoding='utf-8', errors='ignore') as f:
+        content = f.read()
+
+    soup = BeautifulSoup(content, 'html.parser')
 
     cards = []
 
-    for card in root.findall('.//card'):
+    for card in soup.find_all('card'):
         front, back = "", ""
 
-        for field in card.findall('rich-text'):
-            text = "".join(field.itertext()).strip()
+        for field in card.find_all('rich-text'):
+            text = field.decode_contents()
     
             for blob_id in re.findall(r"\{\{blob ([a-f0-9]+)\}\}", text):
                 blob_filename = blob_map.get(blob_id, f"[missing {blob_id}]")
@@ -41,9 +44,9 @@ def read_algo(xml_path, blob_map):
 
 
             if field.get("name") == "front":
-                front = text
+                front = clean_html(text).strip()
             elif field.get("name") == "back":
-                back = text
+                back = clean_html(text).strip()
 
         if front and back:
             cards.append((front, back))
@@ -120,7 +123,7 @@ def convert(path):
     build_anki_package(cards, deck_name, media_files)
 
     # Delay three seconds so can keep up with exeuction of code
-    sleep(100)
+    sleep(5)
 
 def main():
 

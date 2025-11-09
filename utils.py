@@ -1,7 +1,10 @@
 import re
 import os
 import shutil
+
+from xml.etree import ElementTree as ET
 from pathlib import Path
+from bs4 import BeautifulSoup
 
 def detect_blob_type(blobpath):
     with open(blobpath, "rb") as f:
@@ -49,3 +52,18 @@ def convert_blobs(filepath, media_directory):
             media_files.add(new_blob_path)
     
     return blob_map, media_files
+
+def clean_html(html):
+    s = BeautifulSoup(html, "html.parser")
+    for tag in s.find_all(True):
+        # allowed tags for Anki formatting
+        allowed_tags = {'br', 'ul', 'li', 'ol', 'img', 'b', 'i', 'strong', 'em', 'p', 'audio'}
+        if tag.name not in allowed_tags:
+            tag.unwrap()  # remove tag but keep inner text
+        else:
+            # strip all attributes except safe ones (like src for <img> or <audio>)
+            safe_attrs = {'src'}
+            for attr in list(tag.attrs):
+                if attr not in safe_attrs:
+                    del tag[attr]
+    return str(s)
