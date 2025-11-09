@@ -1,0 +1,50 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+env/
+venv/
+.venv/
+pip-wheel-metadata/
+*.egg
+*.pyo
+
+# Environments
+.env
+.env.*
+
+# VS Code
+.vscode/
+.history/
+
+# JetBrains / PyCharm
+.idea/
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# System files
+Thumbs.db
+Desktop.ini
+
+# Archives
+*.zip
+*.tar
+*.gz
+
+# Project-specific ignores
+algo_decks/
+output/
